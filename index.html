@@ -1,184 +1,931 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Control de Asistencia - Alamo’s Club</title>
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alamo's Club | Registro</title>
+
   <style>
+    :root {
+      --black: #050505;
+      --white: #ffffff;
+      --gray: #cfcfcf;
+      --border: rgba(255, 255, 255, 0.08);
+      --muted: #a0a0a0;
+      --radius: 16px;
+      /* Colores Aurora */
+      --aurora-1: rgba(0, 255, 213, 0.15); /* Verde/Cian neón sutil */
+      --aurora-2: rgba(100, 0, 255, 0.12); /* Morado profundo sutil */
+      --aurora-3: rgba(0, 100, 255, 0.1);  /* Azul sutil */
+    }
+
+    html {
+      scroll-behavior: smooth; /* Desplazamiento suave nativo */
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #111 url("LOGO.PNG") no-repeat center center fixed;
-      background-size: 300px;
-      background-blend-mode: overlay;
-      color: white;
       margin: 0;
+      background: var(--black);
+      color: var(--white);
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* === FONDO ANIMADO ESTILO AURORA BOREAL / MEDUSA === */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -2;
+      overflow: hidden;
+      pointer-events: none;
+      background: #000;
+    }
+    
+    .aurora-stream {
+      position: absolute;
+      width: 150%;
+      height: 60%;
+      filter: blur(100px);
+      opacity: 0.6;
+      border-radius: 50%;
+      animation: auroraFlow 25s infinite alternate ease-in-out;
+    }
+
+    .stream-1 {
+      background: linear-gradient(90deg, transparent 0%, var(--aurora-1) 50%, transparent 100%);
+      top: -10%;
+      left: -25%;
+      transform: rotate(-10deg);
+    }
+
+    .stream-2 {
+      background: linear-gradient(90deg, transparent 0%, var(--aurora-2) 50%, transparent 100%);
+      bottom: -10%;
+      right: -25%;
+      transform: rotate(10deg);
+      animation-duration: 30s;
+      animation-delay: 2s;
+    }
+
+    .stream-3 {
+      background: linear-gradient(90deg, transparent 0%, var(--aurora-3) 50%, transparent 100%);
+      top: 30%;
+      left: 0%;
+      height: 40%;
+      animation-duration: 20s;
+      animation-delay: 4s;
+    }
+
+    @keyframes auroraFlow {
+      0% { transform: translate(0, 0) scale(1) rotate(-10deg); }
+      50% { transform: translate(100px, 50px) scale(1.1) rotate(0deg); }
+      100% { transform: translate(-50px, -30px) scale(1) rotate(10deg); }
+    }
+
+    /* === ANIMACIONES DE ENTRADA === */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUpAnim 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+
+    @keyframes fadeUpAnim {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* === HEADER GLASSMORPHISM (Sticky) === */
+    header {
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      padding: 15px 30px;
+      background: rgba(5, 5, 5, 0.6);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    /* ICONO MENÚ HAMBURGUESA */
+    .menu-toggle {
+      background: none;
+      border: none;
+      color: var(--white);
+      font-size: 28px;
+      cursor: pointer;
+      padding: 0;
+      width: auto;
+      margin-top: 0;
+      box-shadow: none;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      z-index: 110;
+    }
+
+    .menu-toggle:hover {
+      transform: scale(1.1);
+      opacity: 0.8;
+      background: none;
+    }
+
+    .header-logo-right {
+      height: 65px;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+
+    .header-logo-right:hover {
+      transform: scale(1.05) rotate(-2deg);
+    }
+
+    .header-center {
+      text-align: center;
+      flex: 1;
+      margin: 0 20px;
+    }
+
+    .header-title {
+      font-size: 20px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 700;
+      background: linear-gradient(90deg, #fff, #aaa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    @media (max-width: 700px) {
+      header { padding: 12px 16px; }
+      .menu-toggle { font-size: 24px; }
+      .header-logo-right { height: 48px; }
+      .header-title { font-size: 15px; letter-spacing: 0.15em; }
+    }
+
+    /* === MENÚ LATERAL DESPLEGABLE (OVERLAY) === */
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 105;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .menu-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
       text-align: center;
     }
 
-    .login, .panel {
-      background: rgba(0,0,0,0.85);
+    .menu-list li {
+      margin: 25px 0;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .menu-overlay.active .menu-list li {
+      animation: fadeUpAnim 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    .menu-link {
+      text-decoration: none;
+      color: var(--white);
+      font-size: 28px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .menu-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -5px;
+      left: 50%;
+      background: #fff;
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+
+    .menu-link:hover {
+      letter-spacing: 0.15em;
+      opacity: 0.8;
+    }
+
+    .menu-link:hover::after {
+      width: 80%;
+    }
+
+    /* CONTENIDO PRINCIPAL */
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 40px 20px;
+    }
+
+    /* === TARJETAS CRISTAL === */
+    .glass-card {
+      background: rgba(15, 15, 15, 0.4);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(255,255,255,0.1);
-      width: 95%;
-      max-width: 480px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     }
 
-    h2 {
-      color: #f1c40f;
-      margin-bottom: 10px;
+    .glass-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+      border-color: rgba(255, 255, 255, 0.15);
     }
 
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 8px;
-      border: none;
+    /* BLOQUE: DESCRIPCIÓN */
+    .about-title {
+      font-size: 28px;
+      margin: 0 0 12px;
+      font-weight: 600;
+    }
+
+    .about-text {
+      color: var(--muted);
       font-size: 16px;
+      margin: 6px 0;
+    }
+
+    /* === NUEVO LAYOUT DE REGISTRO (FLYER + FORMULARIO) === */
+    .grid-registro {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr; /* Flyer a la izq, Form a la der */
+      gap: 40px;
+      margin-top: 40px;
+      align-items: center; /* Centra el contenido verticalmente */
+    }
+
+    @media (max-width: 800px) {
+      .grid-registro { grid-template-columns: 1fr; gap: 30px; }
+    }
+
+    /* ANIMACIÓN Y ESTILO DEL FLYER */
+    .flyer-container {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Resplandor detrás del flyer */
+    .flyer-container::before {
+      content: '';
+      position: absolute;
+      top: 5%; left: 5%; right: 5%; bottom: 5%;
+      background: var(--aurora-1); /* Tonos neón */
+      filter: blur(40px);
+      z-index: -1;
+      border-radius: 20px;
+      animation: pulseFlyer 4s infinite alternate;
+    }
+
+    @keyframes pulseFlyer {
+      0% { opacity: 0.4; filter: blur(30px); }
+      100% { opacity: 0.8; filter: blur(50px); }
+    }
+
+    .event-flyer {
+      width: 100%;
+      max-width: 400px; /* Para que no se haga gigante en pantallas anchas */
+      height: auto;
+      border-radius: var(--radius);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255,255,255,0.15);
+      animation: floatFlyer 6s infinite alternate ease-in-out;
+      transition: transform 0.4s ease, filter 0.4s ease;
+    }
+
+    .event-flyer:hover {
+      transform: scale(1.02) translateY(-5px);
+      filter: brightness(1.1);
+    }
+
+    @keyframes floatFlyer {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-15px); }
+    }
+
+    /* FORMULARIO */
+    .form-card {
+      height: fit-content;
+    }
+
+    .form-card h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 20px;
+      display: block;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.5);
+      color: var(--white);
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s ease;
       box-sizing: border-box;
+    }
+
+    input:focus {
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.08);
+      background: rgba(20, 20, 20, 0.8);
     }
 
     button {
-      background: #e91e63;
-      color: white;
-      font-weight: bold;
+      width: 100%;
+      padding: 14px;
+      margin-top: 24px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #ffffff 0%, #d4d4d4 100%);
+      color: var(--black);
+      font-weight: 700;
+      font-size: 16px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.15);
     }
 
-    button:hover { background: #ff4081; }
-    .hidden { display: none; }
+    button:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 8px 25px rgba(255, 255, 255, 0.25);
+      background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+    }
 
-    #output {
+    #countdown {
       margin-top: 15px;
-      background: #222;
-      padding: 10px;
-      border-radius: 8px;
-      text-align: left;
-      max-height: 400px;
-      overflow-y: auto;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    /* NUEVO: Tabla invisible para nombres y botones */
-    .nombre {
-      display: table;
-      width: 100%;
-      border-bottom: 1px solid #333;
-      padding: 6px 0;
-      table-layout: fixed; /* Mantiene ancho de celdas uniforme */
-    }
-
-    .nombre span, .nombre button {
-      display: table-cell;
-      vertical-align: middle;
-    }
-
-    .nombre span {
+      color: #fff;
       font-size: 15px;
-      padding-left: 5px;
-      word-break: break-word;
-    }
-
-    .nombre button {
-      width: 120px;        /* Ancho fijo */
-      padding: 5px 10px;   /* Más compacto */
-      font-size: 13px;
-      border-radius: 6px;
+      font-weight: 500;
       text-align: center;
-      flex-shrink: 0;
-      background: #27ae60;
-      color: white;
-      cursor: pointer;
+      background: rgba(255,255,255,0.04);
+      padding: 8px;
+      border-radius: 8px;
     }
 
-    .nombre button:disabled {
-      background: gray;
-      cursor: not-allowed;
+    #closed {
+      display: none;
+      margin-top: 14px;
+      color: #ff4d4d;
+      font-size: 15px;
+      font-weight: bold;
+      text-align: center;
     }
 
-    /* Barra de progreso */
-    .progress-container {
+    /* === SECCIÓN GALERÍA AHORA ABAJO DEL REGISTRO === */
+    .galeria-section {
+      margin-top: 50px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin: 0 0 15px;
+      color: var(--gray);
+      font-weight: 600;
+    }
+
+    .gallery-slider {
       display: flex;
       align-items: center;
-      margin: 20px 0;
-      position: relative;
+      gap: 15px;
     }
 
-    .progress-icon {
+    .gallery-nav {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      color: var(--white);
       width: 40px;
       height: 40px;
-      object-fit: contain;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0;
       flex-shrink: 0;
+      transition: all 0.3s ease;
+      box-shadow: none;
+      margin-top: 0;
     }
 
-    .progress-bar {
-      flex: 1;
-      height: 20px;
-      background: #333;
-      border-radius: 10px;
-      margin: 0 5px; 
+    .gallery-nav:hover {
+      background: var(--white);
+      color: var(--black);
+      transform: scale(1.1);
+    }
+
+    .gallery-window {
       overflow: hidden;
+      flex: 1;
+      border-radius: var(--radius);
+    }
+
+    .gallery-track {
+      display: flex;
+      transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .gallery-slide {
+      min-width: 100%;
+      display: flex;
+      gap: 12px;
+    }
+
+    .gallery-item {
+      flex: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #000;
       position: relative;
     }
 
-    .progress-fill {
+    .gallery-item img {
+      width: 100%;
       height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #f1c40f, #e91e63);
-      transition: width 0.5s ease;
-      border-radius: 10px 0 0 10px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease, filter 0.4s ease;
     }
 
-    @media (max-width: 480px) {
-      .panel {
-        width: 95%;
-        padding: 20px;
-      }
-      #output {
-        font-size: 14px;
-      }
+    .gallery-item:hover img {
+      transform: scale(1.08);
+      filter: brightness(1.2);
     }
+
+    .gallery-item::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.5) 100%);
+      pointer-events: none;
+    }
+
+    /* === SESIONES DE YOUTUBE === */
+    .sessions-section {
+      margin-top: 50px;
+    }
+
+    .sessions-header {
+      text-align: center;
+      margin-bottom: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .sessions-logo {
+      height: 90px;
+      object-fit: contain;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.15));
+      animation: pulseGlow 4s infinite alternate ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0% { filter: drop-shadow(0 0 5px rgba(255,255,255,0.1)); }
+      100% { filter: drop-shadow(0 0 20px rgba(255,255,255,0.25)); }
+    }
+
+    .sessions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .session-item {
+      position: relative;
+      display: block;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      aspect-ratio: 16/9;
+      background: #000;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      transition: all 0.3s ease;
+    }
+
+    .session-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .session-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: transform 0.5s ease, filter 0.3s ease;
+    }
+
+    .session-item:hover .session-thumb {
+      transform: scale(1.05);
+      filter: brightness(1.1);
+    }
+
+    .session-item::before {
+      content: '▶';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      font-size: 40px;
+      color: rgba(255,255,255,0.8);
+      z-index: 5;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .session-item:hover::before {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* UBICACIÓN */
+    .location {
+      margin-top: 50px;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .location h3 {
+      margin: 0;
+      font-size: 18px;
+      padding: 22px 22px 12px;
+    }
+
+    .map-frame {
+      width: 100%;
+      height: 300px;
+      border: none;
+      display: block;
+      filter: grayscale(80%) contrast(1.2);
+      transition: filter 0.3s ease;
+    }
+
+    .map-frame:hover {
+      filter: grayscale(0%) contrast(1);
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 50px 20px;
+      margin-top: 50px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--muted);
+      background: rgba(0,0,0,0.4);
+    }
+
+    .footer-title {
+      font-size: 16px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    .social-footer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap; 
+      gap: 20px;
+    }
+
+    .social-footer img {
+      width: 45px; 
+      height: auto;
+      opacity: 0.6;
+      transition: all 0.3s ease;
+      filter: grayscale(100%);
+    }
+
+    .social-footer a:hover img {
+      opacity: 1;
+      transform: scale(1.15) translateY(-3px);
+      filter: grayscale(0%);
+    }
+
+    /* LIGHTBOX */
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.96);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .lightbox.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .lightbox img {
+      max-width: 90%;
+      max-height: 85%;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      transform: scale(0.9);
+      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .lightbox.active img {
+      transform: scale(1);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 30px;
+      right: 40px;
+      font-size: 40px;
+      color: rgba(255,255,255,0.6);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .lightbox-close:hover {
+      color: #fff;
+      transform: rotate(90deg);
+    }
+
+    /* ESTILOS DEL NUEVO CARRETE */
+.flyer-slider-container { position: relative; width: 100%; max-width: 400px; margin: auto; z-index: 1; }
+.flyer-slider-container::before { content: ''; position: absolute; top: 5%; left: 5%; right: 5%; bottom: 5%; background: var(--aurora-1); filter: blur(40px); z-index: -1; border-radius: 20px; animation: pulseFlyer 4s infinite alternate; }
+.flyer-window { width: 100%; overflow: hidden; border-radius: var(--radius); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7); border: 1px solid rgba(255,255,255,0.15); animation: floatFlyer 6s infinite alternate ease-in-out; }
+.flyer-track { display: flex; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+.flyer-track img { width: 100%; flex-shrink: 0; display: block; object-fit: cover; }
+.flyer-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; z-index: 10; font-size: 18px; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
+.flyer-nav:hover { background: white; color: black; }
+.flyer-prev { left: 10px; }
+.flyer-next { right: 10px; }
+@keyframes floatFlyer { 0% { transform: translateY(0); } 100% { transform: translateY(-15px); } }
+@keyframes pulseFlyer { 0% { opacity: 0.4; filter: blur(30px); } 100% { opacity: 0.8; filter: blur(50px); } }
+
   </style>
 </head>
+
 <body>
 
-  <!-- Pantalla de inicio (login) -->
-  <div class="login" id="login">
-    <h2>🔒 Acceso restringido 🔒</h2>
-    <p>Solo administradores de Alamo’s Club.</p>
-    <input type="password" id="password" placeholder="Contraseña">
-    <button onclick="checkPassword()">Ingresar</button>
+  <div class="bg-animation">
+    <div class="aurora-stream stream-1"></div>
+    <div class="aurora-stream stream-2"></div>
+    <div class="aurora-stream stream-3"></div>
   </div>
 
-  <!-- Panel principal -->
-  <div class="panel hidden" id="panel">
-    <h2>📋 Control de Asistencia</h2>
+  <div class="menu-overlay" id="menuOverlay">
+    <ul class="menu-list">
+      <li><a href="#registro" class="menu-link">Registro</a></li>
+      <li><a href="#galeria" class="menu-link">Galería</a></li>
+      <li><a href="#live-session" class="menu-link">Live Session</a></li>
+      <li><a href="#redes" class="menu-link">Redes Sociales</a></li>
+    </ul>
+  </div>
 
-    <!-- Barra de progreso -->
-    <div class="progress-container">
-      <img src="LOGO.PNG" alt="Logo" class="progress-icon">
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
-      <img src="FLAG.PNG" alt="Meta" class="progress-icon">
+  <div class="lightbox" id="lightbox">
+    <span class="lightbox-close" id="lightboxClose">×</span>
+    <img id="lightboxImg" src="">
+  </div>
+
+  <header class="fade-up">
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">☰</button>
+    
+    <div class="header-center">
+      <div class="header-title">ALAMO'S CLUB</div>
     </div>
+    
+    <img src="LOGO.PNG" class="header-logo-right" alt="Alamo's Club logo derecha">
+  </header>
 
-    <input type="text" id="buscar" placeholder="Buscar nombre...">
-    <div id="output"></div>
+  <main>
+
+    <section class="about glass-card fade-up delay-1">
+      <h1 class="about-title">¿Quiénes somos?</h1>
+      <p class="about-text">
+        Proyecto musical que une sesiones íntimas, DJs emergentes y experiencias cuidadas en espacios temporales.
+      </p>
+      <p class="about-text">
+        Creamos eventos donde iluminación, música y ambiente premium se conectan.  
+        Por ahora nos movemos entre spots de la ciudad mientras construimos comunidad y posicionamiento.
+      </p>
+    </section>
+
+    <section class="grid-registro" id="registro">
+
+      <!-- NUEVO CARRETE DE FLYER / ANUNCIOS -->
+<div class="flyer-slider-container fade-up delay-2">
+  <button class="flyer-nav flyer-prev" id="flyerPrev">❮</button>
+  <div class="flyer-window">
+    <div class="flyer-track" id="flyerTrack">
+      <!-- IMAGEN PRINCIPAL -->
+      <img src="Flyer1.png" alt="Flyer Evento">
+      <!-- TUS ANUNCIOS EXTRAS -->
+      <img src="Anuncio1.png" alt="Anuncio 1">
+      <img src="Anuncio2.png" alt="Anuncio 2">
+    </div>
   </div>
+  <button class="flyer-nav flyer-next" id="flyerNext">❯</button>
+</div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+      <div class="form-card glass-card fade-up delay-3">
+        <h2>Registro</h2>
+        <p id="registroContext" style="color:var(--muted); font-size:14px; margin:4px 0 12px;">
+          Cupo limitado para el siguiente evento.
+        </p>
 
-  <script>
+        <form id="guestForm">
+          <label>Nombre completo</label>
+          <input id="nombre" type="text" required autocomplete="off" placeholder="Escribe tu nombre">
+          <button type="submit">Registrar</button>
+        </form>
+
+        <div id="countdown"></div>
+
+        <p id="infoRegistro" style="color:var(--gray); font-size:13px; margin:12px 0 0; text-align:center;"></p>
+
+        <div id="closed">Registro cerrado.</div>
+      </div>
+
+    </section>
+
+    <section class="galeria-section glass-card fade-up delay-4" id="galeria">
+      <div class="section-title">Galería</div>
+
+      <div class="gallery-slider">
+        <button class="gallery-nav" id="galleryPrev">❮</button>
+
+        <div class="gallery-window">
+          <div class="gallery-track" id="galleryTrack">
+
+            <div class="gallery-slide">
+              <div class="gallery-item"><img src="evento1.png" alt="Evento 1"></div>
+              <div class="gallery-item"><img src="evento2.png" alt="Evento 2"></div>
+              <div class="gallery-item"><img src="evento3.png" alt="Evento 3"></div>
+            </div>
+
+            <div class="gallery-slide">
+              <div class="gallery-item"><img src="evento4.png" alt="Evento 4"></div>
+              <div class="gallery-item"><img src="evento5.png" alt="Evento 5"></div>
+              <div class="gallery-item"><img src="evento6.png" alt="Evento 6"></div>
+            </div>
+
+            <div class="gallery-slide">
+              <div class="gallery-item"><img src="evento7.png" alt="Evento 7"></div>
+              <div class="gallery-item"><img src="evento8.png" alt="Evento 8"></div>
+              <div class="gallery-item"><img src="evento9.png" alt="Evento 9"></div>
+            </div>
+
+            <div class="gallery-slide">
+              <div class="gallery-item"><img src="evento10.png" alt="Evento 10"></div>
+              <div class="gallery-item"><img src="evento11.png" alt="Evento 11"></div>
+              <div class="gallery-item"><img src="evento12.png" alt="Evento 12"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <button class="gallery-nav" id="galleryNext">❯</button>
+      </div>
+    </section>
+
+    <section class="sessions-section glass-card fade-up delay-5" id="live-session">
+      <div class="sessions-header">
+        <img src="LIVESESSION.png" class="sessions-logo" alt="Live Sessions Logo">
+        <h3 class="section-title">Sesiones Oficiales</h3>
+      </div>
+
+      <div class="sessions-grid">
+        
+        <a href="https://youtu.be/vVIP96Lq1Ak" target="_blank" class="session-item">
+          <img src="https://img.youtube.com/vi/vVIP96Lq1Ak/maxresdefault.jpg" class="session-thumb" alt="Sesión 1">
+        </a>
+
+        <a href="https://youtu.be/AIh1SkUzOZc" target="_blank" class="session-item">
+          <img src="https://img.youtube.com/vi/AIh1SkUzOZc/maxresdefault.jpg" class="session-thumb" alt="Sesión 2">
+        </a>
+
+        <a href="https://youtu.be/D29XEhIl2II" target="_blank" class="session-item">
+          <img src="https://img.youtube.com/vi/D29XEhIl2II/maxresdefault.jpg" class="session-thumb" alt="Sesión 3">
+        </a>
+
+        <a href="https://youtu.be/AaovbGZs754" target="_blank" class="session-item">
+          <img src="https://img.youtube.com/vi/AaovbGZs754/maxresdefault.jpg" class="session-thumb" alt="Sesión 4">
+        </a>
+
+        <a href="https://youtu.be/wjjo0t6-7Ak" target="_blank" class="session-item">
+          <img src="https://img.youtube.com/vi/wjjo0t6-7Ak/maxresdefault.jpg" class="session-thumb" alt="Sesión 5">
+        </a>
+
+      </div>
+    </section>
+
+    <section class="location glass-card fade-up delay-5">
+      <h3>Ubicación del Evento 30 DE MAYO</h3>
+      <iframe
+        class="map-frame"
+        src="https://www.google.com/maps/embed?pb=!4v1776562092931!6m8!1m7!1sYDjP-rWhR2cvMhYiiMbzZQ!2m2!1d19.44875194527009!2d-99.10989803476265!3f194.7909258245988!4f0.5320206120707951!5f0.7820865974627469" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </section>
+
+  </main>
+
+  <footer id="redes">
+    <div class="footer-title">Síguenos</div>
+    <div class="social-footer">
+      <a href="https://www.instagram.com/_alamo.sclub_/" target="_blank">
+        <img src="instagram.png" alt="Instagram">
+      </a>
+      <a href="https://chat.whatsapp.com/JWL6ZC7vLpVCy5eJIZPHDa" target="_blank">
+        <img src="whatsapp.png" alt="WhatsApp">
+      </a>
+      <a href="https://www.facebook.com/share/1DqW5BVJxd/?mibextid=wwXIfr" target="_blank">
+        <img src="facebook.png" alt="Facebook">
+      </a>
+      <a href="https://www.tiktok.com/@alamo.sclub" target="_blank">
+        <img src="tiktok.png" alt="TikTok">
+      </a>
+      <a href="https://youtube.com/@alamosclub?si=X0A3BQeHMeENWmRX" target="_blank">
+        <img src="YOUTUBE.png" alt="YouTube">
+      </a>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyDLW12w5ZznypXJYMrTNouttdX0vrG6Bzg",
       authDomain: "alamos-club-d1847.firebaseapp.com",
@@ -189,79 +936,209 @@
       measurementId: "G-MNFMT9QLBN"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    let invitados = [];
+    const form = document.getElementById('guestForm');
+    const nombreEl = document.getElementById('nombre');
 
-    function checkPassword() {
-      const pass = document.getElementById("password").value;
-      if (pass === "123456") {
-        document.getElementById("login").classList.add("hidden");
-        document.getElementById("panel").classList.remove("hidden");
-        cargarLista();
-      } else {
-        alert("❌ Contraseña incorrecta");
-      }
-    }
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nombre = nombreEl.value.trim();
+      if (!nombre) return alert('Escribe un nombre.');
 
-    async function cargarLista() {
-      const output = document.getElementById("output");
-      const buscar = document.getElementById("buscar");
+      const nombreNormalizado = nombre.toLowerCase().replace(/\s+/g, ' ').trim();
 
-      const snapshot = await db.collection("invitados").orderBy("nombre").get();
-      invitados = [];
+      try {
+        const snapshot = await getDocs(collection(db, 'invitados'));
+        const existentes = snapshot.docs.map(d =>
+          (d.data().nombre || '').toLowerCase().replace(/\s+/g, ' ').trim()
+        );
 
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        invitados.push({ id: doc.id, nombre: data.nombre, asistio: data.asistio || false });
-      });
-
-      function mostrarLista(filtro = "") {
-        output.innerHTML = "";
-        const filtrados = invitados.filter(inv => inv.nombre.toLowerCase().includes(filtro.toLowerCase()));
-
-        if (filtrados.length === 0) {
-          output.innerHTML = "<p>No hay coincidencias.</p>";
+        if (existentes.includes(nombreNormalizado)) {
+          alert('Este nombre ya está registrado.');
+          form.reset();
           return;
         }
 
-        filtrados.forEach(inv => {
-          const div = document.createElement("div");
-          div.className = "nombre";
-
-          const span = document.createElement("span");
-          span.textContent = inv.nombre;
-
-          const btn = document.createElement("button");
-          btn.textContent = inv.asistio ? "✅ Asistió" : "Marcar asistencia";
-          btn.disabled = inv.asistio;
-
-          btn.onclick = async () => {
-            await db.collection("invitados").doc(inv.id).update({ asistio: true });
-            inv.asistio = true;
-            btn.textContent = "✅ Asistió";
-            btn.disabled = true;
-            actualizarProgreso();
-          };
-
-          div.appendChild(span);
-          div.appendChild(btn);
-          output.appendChild(div);
+        await addDoc(collection(db, 'invitados'), {
+          nombre: nombreNormalizado,
+          createdAt: serverTimestamp()
         });
-      }
 
-      function actualizarProgreso() {
-        const total = invitados.length;
-        const asistieron = invitados.filter(i => i.asistio).length;
-        const porcentaje = (asistieron / total) * 100;
-        document.getElementById("progressFill").style.width = porcentaje + "%";
-      }
+        alert('Registro guardado, recuerda el nombre anotado, se te preguntara a la entrada.');
+        form.reset();
 
-      mostrarLista();
-      actualizarProgreso();
-      buscar.addEventListener("input", (e) => mostrarLista(e.target.value));
+      } catch (err) {
+        console.error(err);
+        alert('Error al registrar.');
+      }
+    });
+
+    // COUNTDOWN
+    const countdownEl = document.getElementById('countdown');
+    const closedEl = document.getElementById('closed');
+let endTime = new Date("MAY 1, 2026 02:00:00").getTime();
+    setInterval(() => {
+      const now = Date.now();
+      const diff = endTime - now;
+
+      if (diff > 0) {
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+        const m = Math.floor((diff % (1000*60*60)) / (1000*60));
+        const s = Math.floor((diff % (1000*60)) / 1000);
+        countdownEl.textContent = `Tiempo restante: ${d}d ${h}h ${m}m ${s}s`;
+      } else {
+        form.style.display='none';
+        countdownEl.style.display='none';
+        closedEl.style.display='block';
+      }
+    }, 1000);
+
+    // GALERÍA CARRUSEL
+    const track = document.getElementById('galleryTrack');
+    const slides = Array.from(track.querySelectorAll('.gallery-slide'));
+    const prevBtn = document.getElementById('galleryPrev');
+    const nextBtn = document.getElementById('galleryNext');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+
+    function updateGallery() {
+      track.style.transform = `translateX(-${currentSlide * 100}%)`;
     }
+
+    prevBtn.addEventListener('click', () => {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      updateGallery();
+    });
+
+    nextBtn.addEventListener('click', () => {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      updateGallery();
+    });
+
+    // Swipe en móvil
+    const galleryWindow = document.querySelector('.gallery-window');
+    let startX = 0;
+
+    galleryWindow.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+    }, { passive: true });
+
+    galleryWindow.addEventListener('touchend', (e) => {
+      const endX = e.changedTouches[0].clientX;
+      const diff = endX - startX;
+      if (Math.abs(diff) > 40) {
+        if (diff < 0) {
+          currentSlide = (currentSlide + 1) % totalSlides;
+        } else {
+          currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+        }
+        updateGallery();
+      }
+    }, { passive: true });
+
+    // LÓGICA TEXTO
+    const registroContext = document.getElementById('registroContext');
+    const infoRegistro = document.getElementById('infoRegistro');
+
+    function actualizarInfoRegistro() {
+      if (!registroContext || !infoRegistro) return;
+      const texto = registroContext.textContent.toLowerCase();
+
+      if (texto.includes('sesión') || texto.includes('sesion')) {
+        infoRegistro.textContent =
+          'Tu registro es para participar por un lugar. Si eres seleccionado, recibirás los detalles por mensaje directo.';
+      } else if (texto.includes('evento')) {
+        infoRegistro.textContent =
+          'Tu registro te da acceso sin cover.';
+      } else {
+        infoRegistro.textContent = '';
+      }
+    }
+    actualizarInfoRegistro();
+
+    // LIGHTBOX FUNCIONALIDAD
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxClose = document.getElementById('lightboxClose');
+    const galleryImages = document.querySelectorAll('.gallery-item img');
+
+    galleryImages.forEach(img => {
+      img.addEventListener('click', () => {
+        lightbox.classList.add('active');
+        lightboxImg.src = img.src;
+      });
+    });
+
+    lightboxClose.addEventListener('click', () => {
+      lightbox.classList.remove('active');
+    });
+
+    lightbox.addEventListener('click', (e) => {
+      if (e.target !== lightboxImg) {
+        lightbox.classList.remove('active');
+      }
+    });
+
+    // LÓGICA DEL MENÚ
+    const menuToggle = document.getElementById('menuToggle');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const menuLinks = document.querySelectorAll('.menu-link');
+
+    function toggleMenu() {
+      const isActive = menuOverlay.classList.contains('active');
+      
+      if (isActive) {
+        menuOverlay.classList.remove('active');
+        menuToggle.textContent = '☰';
+        document.body.style.overflow = '';
+      } else {
+        menuOverlay.classList.add('active');
+        menuToggle.textContent = '✕';
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    menuToggle.addEventListener('click', toggleMenu);
+
+    menuLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        toggleMenu();
+      });
+    });
+
+    menuOverlay.addEventListener('click', (e) => {
+      if (e.target === menuOverlay) {
+        toggleMenu();
+      }
+    });
+
+    // --- LÓGICA DEL CARRETE AUTOMÁTICO (7 SEGUNDOS) ---
+const fTrack = document.getElementById('flyerTrack');
+const fImages = fTrack.querySelectorAll('img');
+const fPrev = document.getElementById('flyerPrev');
+const fNext = document.getElementById('flyerNext');
+let fIndex = 0;
+
+function moveFlyer(index) {
+    if (index >= fImages.length) fIndex = 0;
+    else if (index < 0) fIndex = fImages.length - 1;
+    else fIndex = index;
+    fTrack.style.transform = `translateX(-${fIndex * 100}%)`;
+}
+
+fNext.addEventListener('click', () => { moveFlyer(fIndex + 1); resetFlyerTimer(); });
+fPrev.addEventListener('click', () => { moveFlyer(fIndex - 1); resetFlyerTimer(); });
+
+let flyerAuto = setInterval(() => moveFlyer(fIndex + 1), 7000);
+function resetFlyerTimer() { 
+    clearInterval(flyerAuto); 
+    flyerAuto = setInterval(() => moveFlyer(fIndex + 1), 7000); 
+}
+
   </script>
+
 </body>
 </html>
